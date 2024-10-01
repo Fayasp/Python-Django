@@ -1,0 +1,19 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/nav_style.css' %}">
+<nav>
+    <ul>
+        <a href=""> <img src=" {% static 'assets/icon/new-logo.svg' %} "/></a>
+        <li><a href=" {% url 'home' %}">Home</a></li>|
+        <li><a href=" {% url 'about' %}">About</a></li>|
+        <li><a href=" {% url 'contact' %}">Contact</a></li> |
+        
+        {% if user.is_authenticated %}
+        <li><a href=" {% url 'posts:create-member' %}">User</a></li>|
+            <li><a href=" {% url 'posts:new-feed' %}">New Post</a></li>|
+            <!-- <li><a href=" {% url 'posts:new-post' %}">New Post</a></li>| -->
+            <li><a href="{% url 'users:logout' %}">LogOut</a></li>
+        {% else %}
+            <li><a href="{% url 'users:login' %}">Login User</a></li>|
+        {% endif %}
+    </ul>
+</nav>

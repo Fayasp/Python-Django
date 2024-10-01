@@ -1,0 +1,49 @@
+* {
+    margin : 0;
+    padding : 0;
+    box-sizing: border-box;
+
+}
+
+
+nav {
+    background-color: rgb(187, 28, 0);
+    padding: 1rem;
+}
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: space-around;
+}
+a {
+    text-decoration: none;
+}
+
+nav ul a {
+place-items: left;
+}
+
+
+nav ul li {
+    display: inline;
+}
+
+nav ul li a {
+    color: black;
+    text-decoration: none;
+    padding: 0.5 rem 1 rem;
+    display: block;
+}
+
+nav ul li a:hover{
+    text-decoration: underline;
+    border-radius: 5px;;
+}
+
+.banner {
+    display:block;
+    width: 100%;
+    max-width: 800px;
+}

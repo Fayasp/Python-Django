@@ -1,0 +1,10 @@
+{% extends 'main.html' %}
+{%  load static%}
+
+{% block content %}
+<p>Log Out</p>
+<form class="logout" action="{% url 'users:logout' %}" method="post">  
+{% csrf_token %}
+{{ form }}<button class="form-submit">Logout</button>
+</form>
+{% endblock %}

@@ -1,0 +1,218 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block content %}
+<div id="post" style="text-align: center;">
+</div>
+<div id="media-images">
+</div>
+<script>
+var BASE_URL= 'http://localhost:8001'
+</script>
+
+<script>
+$(document).ready(function() {
+    $.ajax({
+        type: 'GET',
+        url: `${BASE_URL}/post/getposts`,
+        success: function(response) {
+            
+            
+            $("#media-images").empty();
+            const posts = response.post;
+            console.log(posts);
+            
+            
+            
+            posts.forEach((post,i) =>{
+                const {id,title,banner} = post
+                console.log(id,title,banner);
+                
+                
+            const data = `<h3>${title}</h3> `
+            $("#post").append(data)
+            const PostImageData = `<a href="/post/get-post/${id}"> <img src="${banner}" style="width: 30%; height: 30%;"> </a>`;
+            $("#post").append(PostImageData)
+            })
+            
+        }
+    });
+})
+</script>
+
+<!-- for adding image to the template from base dir -->
+<!-- <script>
+$(document).ready(function() {
+    $.ajax({
+        type: 'GET',
+        url: 'http://localhost:8001/post/',
+        success: function(response) {
+            $("#media-images").empty();
+            const images = response.img;
+            for (var img in images)
+        {
+            console.log(images[img])
+            const data = `<img src="/${images[img]}" style="width: 100%; height: 100%;">`;
+            $("#media-images").append(data)
+        }
+        }
+    });
+});
+</script> -->
+
+
+
+<!-- </div> -->
+<!-- <script>
+$(document).ready(function() {
+    $.ajax({
+        type: 'GET',
+        url: 'http://localhost:8001/post/getposts',
+        success: function(response) {
+            console.log(response);
+            
+            $("#media-images").empty();
+            const images = response.img;
+            
+            for (var img in images)
+        {
+            console.log(images[img])
+            const data = `<img src="/${images[img]}" style="width: 100%; height: 100%;">`;
+            $("#media-images").append(data)
+        }
+        }
+    });
+});
+
+</script> -->
+
+<!-- for adding image to the template from base dir -->
+<!-- <script>
+$(document).ready(function() {
+    $.ajax({
+        type: 'GET',
+        url: 'http://localhost:8001/post/',
+        success: function(response) {
+            $("#media-images").empty();
+            const images = response.img;
+            for (var img in images)
+        {
+            console.log(images[img])
+            const data = `<img src="/${images[img]}" style="width: 100%; height: 100%;">`;
+            $("#media-images").append(data)
+        }
+        }
+    });
+});
+</script> -->
+
+
+
+
+
+<!-- <button id="button">Click</button> 
+<input type="number" name="number" id="number">
+
+<div id="image-doc" style="display: flex;flex-wrap: wrap;gap: 12px;">
+    
+</div>
+<script>
+
+const fetchDog = document.getElementById('button')
+var BASE_URL = "https://dog.ceo/api"
+fetchDog.addEventListener('click',()=>{
+    let getImgNum = document.getElementById("number").value
+    $.ajax({
+        type:'GET',
+        url : `${BASE_URL}/breeds/image/random/${getImgNum}`,
+        success:function(response){
+            $("#display-data").empty();
+            {
+
+ const dogImg = response.message
+            dogImg.forEach(path => {
+                const data =  
+                `<div style="min-width:300px;height:300px"> <img src="${path}" alt="Dog Image" style="width: 100%;height:100%; object-fit:cover"> </div>`
+                $('#image-doc').append(data)
+            });
+
+            }
+        }
+    })
+});  -->
+<!-- </script>  -->
+
+<!-- <button id="button">Click</button>
+<input type="number" name="number" id="number">
+
+<div id="image-doc" style="display: flex;flex-wrap: wrap;gap: 12px;">
+    
+</div>
+<script>
+
+const fetchDog = document.getElementById('button')
+var BASE_URL = "https://dog.ceo/api"
+fetchDog.addEventListener('click',()=>{
+    let getImgNum = document.getElementById("number").value
+    $.ajax({
+        type:'GET',
+        url : `${BASE_URL}/breeds/image/random/${getImgNum}`,
+        success:function(response){
+            $("#display-data").empty();
+            {
+
+ const dogImg = response.message
+            dogImg.forEach(path => {
+                const data =  
+                `<div style="min-width:300px;height:300px"> <img src="${path}" alt="Dog Image" style="width: 100%;height:100%; object-fit:cover"> </div>`
+                $('#image-doc').append(data)
+                
+            });
+
+            }
+           
+
+        }
+    })
+
+
+});
+</script> -->
+
+
+
+
+
+
+<!-- for show a random image when clicking a button  -->
+<!-- <div>
+    <img src="" id="dogimage" alt="Dog image" style="width: 500px; height: auto;">
+</div>
+
+<button id="button">Fetch</button> -->
+<!-- <script>
+    const fetchDog = document.getElementById('button')
+    var BASE_URL = "https://dog.ceo/api"
+    
+    fetchDog.addEventListener("click",()=>{
+            $.ajax({
+            type:'GET',
+            url: `${BASE_URL}/breeds/image/random`,
+            success:function(response){
+                const dogImg = response.message
+                $('#dogimage').attr('src',dogImg)
+                console.log(response.message)
+    
+    
+                // const dogimg = response
+            }
+    
+        })
+    })
+    
+    </script> -->
+    
+
+</section>
+{% endblock %}
+

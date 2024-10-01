@@ -1,0 +1,472 @@
+
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+<style>
+a {
+    text-decoration: none;
+}
+
+</style>
+<div style="display: flex; justify-content: space-evenly;">
+    <div>
+        <form id="user-form" >
+            {% csrf_token %}
+            <div>
+
+                <h3>Username</h3><input type="text" name="username" id="username" ><br>
+                <span class="error"></span>
+            </div>
+            <div>
+
+                <h3>Email</h3><input type="email" name="email" id="email" ><br>
+                <span class="error"></span>
+            </div>
+            <div>
+
+                <h3>Age</h3><input type="age" name="age" id="age" ><br>
+                <span class="error"></span>
+            </div>
+            <div>
+                <input   type="hidden" name="id" id="id" >  
+            </div>
+                <select name="posts"  multiple>
+                    {% for post in posts %}
+                    <option value=" {{ post.id }} "> {{ post.title }} </option>
+                    {% endfor %}
+                
+                </select>
+            <button type="button"  id="button" onclick="createMember()" >Submit</button>
+            <button type="button" id="update-btn" onclick="updateMember()" style="display:none;">update</button>
+            
+        </form>
+    </div>
+    <div>
+        <div>
+            <from >
+                <input type="text"  name="username" placeholder="search members" onkeyup="searchMembers(event)"  style="width: 100%;">
+            </from>
+        </div>
+        <div>
+            <label for="cars">Age Between</label>
+                <select name="age" id="age" onchange="searchMembersAge(event)">
+                <option value="">---</option>   
+                <option value="10_15">10-15</option>
+                <option value="15_20">15-20</option>
+                <option value="20_25">20-25</option>
+                <option value="25_30">25-30</option>
+            </select>
+        </div>
+        <div>
+            <ul id="members-list" style="font-size: 32px; list-style-type: none">
+                <li></li>
+            </ul>
+        </div>     
+    </div>
+
+    
+</div>
+<div id="delete-user">
+    <h4 id="delete-msg" style="display: none;">Are you sure that you want to delete this user?</h4>
+    <button id ="yes-btn" style="display: none;" type="button" onclick="confirmDelete(event)">Yes</button>
+    <button id ="no-btn" style="display: none;" type="button" onclick="noDelete()">No</button>
+</div>
+
+<script>
+    var BASE_URL= 'http://localhost:8001'
+    </script>
+  
+<script>
+
+    const createMember = ()=>{
+        
+        const form = document.getElementById("user-form");
+
+        let postIds = []
+
+        const formData = new FormData(form) 
+        formObjectData = Object.fromEntries(formData) // dictionry that values of form
+
+        for (data in formObjectData) {
+            if (data == "posts"){
+                delete formObjectData[data]  
+            }
+        }
+        
+        
+        for (let [key,value] of formData.entries()) {
+
+            if(key == "posts") {
+                postIds.push(parseInt(value))
+            }
+            
+    
+        }
+        formObjectData.posts = postIds
+    
+        for (const [key, value] of formData.entries()) {
+            const elem = document.querySelector(`[name="${key}"]`);
+            if (elem) {
+                elem.removeAttribute("style");
+                const errorElem = elem.parentElement.querySelector(".error");
+            if (errorElem) {
+              errorElem.textContent = "";
+                  }
+              }
+            }
+
+
+            // var total = ;
+            // for(var i = 1; i<= total ; i++){
+            //     var added = document.createElement('option');
+            //     var select1 = $("#posts")
+            //     added.value = i
+            //     added.innerHTML = i
+            //     select1.append(added)
+            // }
+
+
+        $.ajax({
+            type:'POST',
+            url : "/post/create-member",
+            data : JSON.stringify(formObjectData), /* converting formData into objects  then convert to string */
+            headers: {
+                "X-CSRFToken" : `{{csrf_token}}`
+            },
+            
+            success: function(data){
+                fechMembers({username:"",age:""})
+                alert("User Created")
+                    $('#username').removeAttr('style'); 
+                    $('#email').removeAttr('style');
+                    $('#age').removeAttr('style');
+                    
+                        const usernameElement = document.querySelector(`[name="username"]`)
+                        const emailElement = document.querySelector(`[name="email"]`)
+                        const ageElement = document.querySelector(`[name="age"]`)
+                        usernameElement.value = ""
+                        emailElement.value = ""
+                        ageElement.value = ""
+                    
+            },
+            error: function(data){
+                
+                const response = data?.responseJSON
+                
+                if(response){
+                    for(const [key,value] of Object.entries(response)){
+                        const elem = document.querySelector(`[name="${key}"]`)
+                        elem.style.border = "1px solid red"
+                        elem.parentElement.querySelector(".error").textContent = value
+                    }
+                    
+                }
+               
+            }
+     }); 
+
+
+     
+}
+
+
+
+</script>
+
+<script>
+    const searchMember = {username:"",age:""}
+    </script>
+
+<!-- script to list the members -->
+<script>
+   const fechMembers = (searchMember)=> {
+    $('#members-list').empty();
+    $('#members-list').html("<li>Loading...</li>");
+    $.ajax({
+        type:'GET',
+        url : `${BASE_URL}/post/getmembers?username=${searchMember.username}&age=${searchMember.age}`,
+        success : function(response){
+            const [{id,username,email,age}]  = response.members     
+            console.log(id);
+              
+            const membersList = response.members;
+            const membersCount = membersList.length
+           
+            if (membersCount == 0 ){
+                $('#members-list').html("<li>No Member...</li>");
+                
+            }
+            else  {
+                $('#members-list').empty();
+            for(var member in membersList){
+                let memberData = membersList[member]
+                
+
+                const data = `<li>${memberData.age} <a href="/post/member-data/${memberData.id}"> ${memberData.username}</a> <button type="button" onclick="deleteMember(event,${memberData.id})">Delete</button> <button type="button" id="upt-btn" onclick="editMember(event,${memberData.id})">Edit</button></li>`
+                $('#members-list').append(data)
+            }
+            }
+        }
+    })
+
+    $.ajax({
+    type: 'GET',
+    url: `${BASE_URL}/post/getmembers?username=${searchMember.username}&age=${searchMember.age}`,
+    success: function(response) {
+        const membersList = response.members;
+        const membersCount = membersList.length;
+
+        // Clear the list before populating it
+        $('#members-list').empty();
+
+        if (membersCount === 0) {
+            $('#members-list').html("<li>No Member...</li>");
+        } else {
+            membersList.forEach(member => {
+                const data = `
+                    <li>
+                        ${member.age} 
+                        <a href="/post/member-data/${member.id}">${member.username}</a> 
+                        <button type="button" onclick="deleteMember(event,${member.id})">Delete</button>
+                        <button type="button" id="upt-btn" onclick="editMember(event,${member.id})">Edit</button>
+                    </li>`;
+                $('#members-list').append(data);
+            });
+        }
+    }
+});
+
+   }
+   fechMembers(searchMember)
+</script>
+
+<!-- script to delete a member -->
+<!-- <script>
+    const deleteMember = (event,id)=> {
+    const li = event.target.closest("li")
+    $.ajax({
+        type:'GET',
+        url : `${BASE_URL}/post/delete/${id}`,
+        success: function(response){
+        li.remove();
+        }
+    });
+}
+
+</script> -->
+
+<script>
+let setDeleteId = null
+const deleteMember = (event,id)=> {
+    
+
+setDeleteId = id
+
+
+const deleteMsg = document.getElementById("delete-msg")
+const yesBtn =  document.getElementById("yes-btn")
+const notBtn = document.getElementById("no-btn")
+
+deleteMsg.style.display = "block"
+yesBtn.style.display = "block"
+notBtn.style.display = "block"
+
+
+}
+
+const confirmDelete = ()=> {
+ 
+    console.log(event.target.closest("li"));
+
+    if (!setDeleteId){
+        alert("Somethin went wrong!")
+        return
+    }
+
+    $.ajax({
+        type:"GET",
+        url : `${BASE_URL}/post/delete/${setDeleteId}`,
+        success:function(response){
+            fechMembers(searchMember)
+            const deleteMsg = document.getElementById("delete-msg")
+            const yesBtn =  document.getElementById("yes-btn")
+            const notBtn = document.getElementById("no-btn")
+
+            deleteMsg.style.display = "none"
+            yesBtn.style.display = "none"
+            notBtn.style.display = "none"
+                
+        }
+    })
+    
+}
+
+const noDelete = ()=> {
+const deleteMsg = document.getElementById("delete-msg")
+const yesBtn =  document.getElementById("yes-btn")
+const notBtn = document.getElementById("no-btn")
+
+deleteMsg.style.display = "none"
+yesBtn.style.display = "none"
+notBtn.style.display = "none"
+    
+    
+}
+
+</script>
+
+
+
+
+
+<script>
+    let searchMembersFlag = false
+    const searchMembers = (event)=> {
+
+        const eventValue = event.target.value.trim()
+        if (eventValue.length == 0){
+            searchMember.username = ""
+        }
+
+        if (eventValue.length > 0 && event.keyCode === 13){
+            searchMember.username = eventValue
+            fechMembers(searchMember)
+            searchMembersFlag = true
+        }
+        if (!eventValue.length && searchMembersFlag)  /* ! used for make the true value null  */ //!eventValue.length check if the value is 0
+        {
+            fechMembers(searchMember)
+            searchMembersFlag = false      
+        }
+// for live search
+
+        // const eventValue = event.target.value.trim()
+        // fechMembers(eventValue)
+    }            
+</script>
+
+<!-- Age search -->
+
+<script>
+
+const searchMembersAge = ()=> {
+    const memberAge = event.target.value
+    searchMember.age = memberAge
+    fechMembers(searchMember)
+    
+}
+
+
+const editMember =  (event,id) => {
+
+    // const uptbtn = document.querySelector("#update-btn")
+    // uptbtn.remove()
+
+    $.ajax ({
+        
+        type:'GET',
+        url : `${BASE_URL}/post/getmember/${id}`,
+        success:function(response){
+        const {username,email,age} = response
+
+
+        const userNameElement = document.querySelector(`[name='username']`)
+        const emailElement = document.querySelector(`[name='email']`)
+        const ageElement = document.querySelector(`[name='age']`)
+        const idElement = document.querySelector(`[name='id']`)
+        
+        userNameElement.value = username
+        emailElement.value = email
+        ageElement.value = age
+        idElement.value = id
+
+        const submitbtn = document.querySelector("#button")
+        submitbtn.style.display = "none"
+
+        const uptbtn = document.querySelector("#update-btn")
+        uptbtn.style.display = "block"
+      
+        }
+
+
+    });
+    
+}
+
+
+const updateMember = () => {
+
+    const form = document.getElementById("user-form");
+    const formData = new FormData(form);    
+    const dataObject = Object.fromEntries(formData.entries());
+    
+    const uptPostIds = []
+
+    for(let[key,value] of formData.entries()) {
+      if(key == "posts"){
+        uptPostIds.push(parseInt(value))
+      }
+
+    }
+    dataObject.posts = uptPostIds
+    console.log(dataObject);
+    
+    const id = dataObject.id
+
+    
+
+    for (const [key, value] of formData.entries()) {
+            const elem = document.querySelector(`[name="${key}"]`);
+            if (elem) {
+                elem.removeAttribute("style");
+                const errorElem = elem.parentElement.querySelector(".error");
+            if (errorElem) {
+              errorElem.textContent = "";
+                  }
+              }
+            }
+
+    
+
+    $.ajax ({
+        type:'POST',
+        url : `${BASE_URL}/post/update_member_to/${id}`,
+        data : JSON.stringify(dataObject), /* converting formData into objects  then convert to string */
+        headers: {
+                "X-CSRFToken" : `{{csrf_token}}`
+            },
+
+        success : function(response){
+            alert("Member updated")
+            fechMembers(searchMember)
+                for(const [key,value] of Object.entries(response)){
+                        const elem = document.querySelector(`[name="${key}"]`)
+                        elem.value = ""
+                    }
+
+                    const submitbtn = document.querySelector("#button")
+                    submitbtn.style.display = "block"
+
+                    const uptbtn = document.querySelector("#update-btn")
+                    uptbtn.style.display = "none"
+        
+
+        },
+
+        error: function(data){
+            console.log(data.responseJSON);
+            
+            const response = data?.responseJSON
+            if(response){
+                    for(const [key,value] of Object.entries(response)){
+                    const elem = document.querySelector(`[name="${key}"]`)
+                    elem.style.border = "1px solid red"
+                    elem.parentElement.querySelector(".error").textContent = value
+                }
+                }}
+        });
+}
+</script>
+
+{% endblock %}
+

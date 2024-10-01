@@ -1,0 +1,20 @@
+{% extends 'main.html' %}
+{% load static %}
+
+
+{% block content %}
+<nav>
+    <ul>
+        {% if user.is_authenticated %}
+            <li><a href="{% url 'posts:list' %}">Post</a></li>
+        {% else %}
+        <li><a href="{% url 'users:user' %}">User</a></li>
+      
+        {% endif %}
+
+    </ul>
+
+</nav>
+
+<!-- <p>About</p> -->
+{% endblock %}

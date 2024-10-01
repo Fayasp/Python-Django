@@ -1,0 +1,136 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+    .home-container {
+        display: grid;
+        grid-template-columns: 1fr 3fr 1fr;
+    }
+</style>
+
+<div class="home-container">
+    <div>
+        <h2 id="member-id" style="display: none;">{{  member.id }}</h2>
+        <h2  style="text-align: center;">Member : {{ member.username }}</h2>
+        <h4  style="text-align: center;">Email : {{ member.email  }} </h4>
+        <h4  style="text-align: center;">Age : {{ member.age }}</h4>
+    </div>
+    <div>
+        <h2 style="text-align: center;">Posts.....</h2>
+        {% for post in posts %}
+        <p>{{ post.title }}</p>  
+        
+        <a href="{% url 'posts:post_page' post.id %}">
+            <img class="banner" style="margin-left: 170px;" src="{{ post.banner.url }}" alt="{{ post.title }}" />
+        </a>
+        
+    {% endfor %}
+    
+
+    </div>
+
+    <div>
+        <form id="address-form" method="">
+        {% csrf_token %}    
+
+        <input type="hidden" name="member" id="member">
+        <h3>Street</h3> <input type="text" name="street" id="street" readonly><br>
+        <h3>City</h3> <input type="text" name="city" id="city" readonly><br>
+        <h3>County</h3> <input type="text" name="country" id="country" readonly> <br>
+        <button type="button" id="edit-btn" onclick="editAddress()" style="display: block;">edit</button>
+        <button type="button" id="submit-btn" onclick="submitAddress()" style="display: none;">submit</button>
+
+    </form>
+    </div>
+</div>
+<script>
+    const BASE_URL = 'http://localhost:8001'
+    var memberId = document.querySelector("#member-id").textContent
+    </script>
+<script>
+    
+    const editAddress = ()=> {
+
+        const editBtn = document.querySelector("#edit-btn")
+        editBtn.style.display = "none"
+        const subBtn = document.querySelector("#submit-btn")
+        subBtn.style.display = "block"
+
+        
+        const member = document.querySelector("[name='member']")
+        const street = document.querySelector("[name='street']")
+        const city = document.querySelector("[name = 'city']")
+        const counrty = document.querySelector("[name = 'country']")
+
+        street.removeAttribute("readonly")
+        city.removeAttribute("readonly")
+        counrty.removeAttribute("readonly")
+
+
+        const memberId = document.querySelector("#member-id").textContent
+        console.log(memberId);
+        
+        member.value = memberId
+        console.log(member);
+
+
+       
+     
+        
+    }
+    
+
+    const fetchMemberAddress = ()=> {
+           
+        $.ajax ({
+     
+            type:'GET',
+            url : `${BASE_URL}/post/getaddress/${memberId}`,
+            success : function(response){
+                const {street,city,country} = response
+
+                const streetElm = document.querySelector("[name='street']")
+                const cityElm = document.querySelector("[name='city']")
+                const countryElm = document.querySelector("[name='country']")
+
+                streetElm.value = street
+                cityElm.value = city
+                countryElm.value =  country
+
+
+            }
+            
+        })
+    }
+    fetchMemberAddress()
+    const submitAddress = ()=> {
+        
+            const addressForm = document.getElementById("address-form");
+            const formData = new FormData(addressForm)
+            const dataObject = Object.fromEntries(formData.entries())
+
+            $.ajax ({
+                type : "POST",
+                url : `${BASE_URL}/post/member-addres`,
+                data: JSON.stringify(dataObject),
+                headers: {
+                    "X-CSRFToken" : `{{csrf_token}}`
+                },
+                success : function(response){
+                    
+                    alert("address created")
+                },
+                error : function(data){
+                    alert("Something Went wrong")
+                }
+            })
+            
+        
+        
+    }
+</script>
+
+
+
+{% endblock %}

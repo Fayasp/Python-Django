@@ -1,0 +1,45 @@
+{% extends 'main.html' %}
+{% load static%}
+
+{% block content %}
+<p>Login User</p>
+
+
+    <form id="login_form">
+
+        {% csrf_token %}
+        <div>
+            <h3>Username</h3><input type="text" name="username" id="username"><br>
+        </div>
+        <div>
+            <h3>Password</h3><input type="password" name="password" id="password"><br>
+        </div>
+        <button type="button" id="button" onclick="loginUser()">Submit</button>
+    </form>
+
+    <script>
+        const loginUser = async () => {
+
+            // const form = document.querySelector("form[class='login_form']");
+            const form = document.getElementById("login_form");
+
+            const formData = new FormData(form)
+            const formDataObject = Object.fromEntries(formData)
+
+            try {
+                const response = await axios.post("{% url 'users:login' %}", formDataObject, {
+                    headers: {
+                        "X-CSRFToken": `{{csrf_token}}`
+                    },
+                });
+
+                if(response.status===200){
+                    window.location.href = "{% url 'posts:list' %}"
+                }
+            }
+            catch (error) {
+                console.log(error);
+            }
+        }
+    </script>
+    {% endblock %}

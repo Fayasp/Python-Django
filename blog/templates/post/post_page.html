@@ -1,0 +1,31 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title%}
+{% endblock %} 
+{% block content %}
+
+
+<section>
+  
+    <h1>{{ post.title }}</h1>
+      <p>{{ post.date |timesince}}</p>
+      <p>{{ post.body }}</p>
+      <br/>
+      <img class="banner" style="    margin-left: 555px;" src="{{ post.banner.url }}"alt = "{{post.title }}"/>
+      <h3 style="text-align: center;">Created By : {{ post.auther }}</h3>
+      <a href="{% url 'posts:delete_post' post.id %}">
+        <button style="background-color: red; color: white; border: none; padding: 10px 20px; cursor: pointer; margin-left: 900px;" name="Delete" aria-label="Delete Post" >
+          Delete
+        </button>
+      </a>
+      <h3 style="text-align: center;" >Members</h3>
+      {% for member in members %}
+          <a href="{% url  'posts:memberdetails' member.id %}"><p >{{ member.username }} </p></a>
+      {% endfor %}
+
+</section>
+
+{% endblock %}
+    
+</form>

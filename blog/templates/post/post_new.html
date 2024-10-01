@@ -1,0 +1,27 @@
+
+{% extends 'main.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title%}
+{% endblock %} 
+{% block content %}
+<section>
+<h1>New Post</h1>
+<form class="form-with-validation" action="{% url 'posts:new-post' %}" method="post"   
+enctype="multipart/form-data">
+<!-- The action attribute specifies where the form data should be sent when the form is submitted.  -->
+{% csrf_token %}
+{% render_field form.title placeholder="title" class+="form-control" %}
+<br/>
+{% render_field form.body placeholder="body" class+="form-control" %}
+<br/>
+{% render_field form.banner placeholder="slug" class+="form-control" %}
+<br/>
+{% render_field form.slug placeholder="slug" class+="form-control" %}
+<br/>
+<button class="form-submit">Add</button>
+</form>
+</section>
+{% endblock %}
+

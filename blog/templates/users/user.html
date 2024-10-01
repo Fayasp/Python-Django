@@ -1,0 +1,16 @@
+{% extends 'main.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<p>User</p>
+<nav>
+    <ul>
+        <li><a href="{% url 'users:register' %}">Register</a></li>
+
+
+    </ul>
+</nav>
+
+{% endblock %}

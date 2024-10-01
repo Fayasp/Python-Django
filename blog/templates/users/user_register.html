@@ -1,0 +1,81 @@
+{% extends 'main.html' %}
+{%  load static %}
+
+{% block content %}
+<p>Register</p>
+<div>
+    <form class="user-form">
+        {% csrf_token %}
+        <div>
+            <h3>Username</h3><input type="text" name="username" id="username" ><br>
+            <span class="error"></span>
+        </div>
+    <div>
+        <h3>Password</h3><input type="password" name="password" id="password">
+        <span class="error"></span>
+    </div>
+    <div>
+        <h3>Confirm Password</h3><input type="password" name="confirm_password" id="password2">
+        <span class="error"></span>
+    </div>
+     <button type="button" id="button" onclick="createUser()">Submit</button>
+    </form>
+
+</div>
+
+<script>
+const createUser = async ()=> {
+
+    const form = document.querySelector(".user-form")
+    console.log(form);
+    
+    const formData = new FormData(form)
+
+    const formObjectData = Object.fromEntries(formData)
+
+    for (const [key, value] of formData.entries()) {
+            const elem = document.querySelector(`[name="${key}"]`);
+            if (elem) {
+                elem.removeAttribute("style");
+                const errorElem = elem.parentElement.querySelector(".error");
+            if (errorElem) {
+              errorElem.textContent = "";
+                  }
+              }
+            }
+try {
+    const response = await axios.post('/user/register/', formObjectData, {
+        headers: {
+            "X-CSRFToken": `{{csrf_token}}`
+        },
+    });
+    if (response.status == 201){
+        alert("User Registration Completed")
+        window.location.href = "{% url 'posts:list' %}"  
+    } 
+} 
+catch (error) {
+    const response = error.response.data        
+    if(response){
+        for(const [key,value] of Object.entries(response)) {
+            const elm = document.querySelector(`[name="${key}"]`)            
+            elm.style.border = "1px solid red"
+            elm.parentElement.querySelector(".error").textContent = value
+        }
+    }
+}
+}
+</script>
+
+
+{% endblock %}
+
+
+
+<!-- 
+
+<form class="form-with-validation" action="/user/register/" method="post">  
+    {% csrf_token %} 
+    
+    {{ form }}<button class="form-submit">Submit </button>
+    </form>  -->

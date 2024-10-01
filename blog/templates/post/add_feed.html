@@ -1,0 +1,118 @@
+
+{% extends 'main.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+
+<form id="post-form">
+    {% csrf_token %}
+    <h3>Title</h3> <input type="title" name="title" id="title"><br>
+    <h3>Body</h3> <input type="body" name="body" id="body"><br>
+    <h3>Banner</h3> <input type="file" name="banner" id="banner"><br>
+
+    <!-- <select name="posts" id="posts">
+        <option value=""></option>
+       
+      </select> -->
+    <button type="button" onclick="createPost()">Submit</button>
+</form>
+
+
+
+
+<script>
+
+// $(document).on('submit','#post-form',function(e)
+// {
+//     const form = document.getElementById("post-form'")
+//     const formData =  new  FormData(form)
+//     formObjectData = Object.fromEntries(formData)
+//     for([key,value] of formData.entries()){
+//         console.log(key,value);
+        
+//     }
+//     e.preventDefault();;
+
+//     $.ajax({
+//         type : 'POST',
+//         url : "new-feed",
+//         data :formData,
+//         headers: {
+//             "X-CSRFToken" : `{{csrf_token}}`
+//         },
+//         success : function(data){
+//             alert(data)
+//         },
+//         error: function(data){
+//             alert("Something wrong")
+//         }
+//     })
+
+
+// })
+
+
+
+
+
+// $(document).on('submit','#post-form',function(e)
+// {
+//     e.preventDefault();
+
+//     $.ajax({
+//         type:'POST',
+//         url : "new-feed",
+//         data : {
+
+//             title : $('#title').val(),
+//             body:$('#body').val(),
+//             banner:$('#banner').val(),
+//             csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+
+//         },
+//         success: function(data){
+//             alert(data);
+//         }
+//     });
+
+// });
+
+// var total = 5;
+// for(var i = 1; i<= total ; i++){
+//     var added = document.createElement('option');
+//     var select1 = $("#posts")
+//     added.value = i
+//     added.innerHTML = i
+//     select1.append(added)
+// }
+
+</script>
+<script>
+    const createPost = async ()=>{
+        const form = document.getElementById('post-form')
+        const formData = new FormData(form)
+        
+        const postData = {}
+        for([key,value] of formData.entries()){
+        postData[key] = value;
+        
+    }        
+        try {
+           const response = await axios.post("new-feed",formData,{
+
+            headers:{
+                "X-CSRFToken" : `{{csrf_token}}`
+
+            },
+            success : function(data){
+                alert(data)
+            }
+           });
+        }
+        catch (error){
+        console.log(error);        
+        }
+    }
+</script>
+
+{% endblock %}
